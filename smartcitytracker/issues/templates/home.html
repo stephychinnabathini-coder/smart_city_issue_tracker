@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    {% extends 'base.html' %}
+{% block content %}
+<div class="row text-center mb-4">
+  <div class="col-md-3"><div class="card p-3 shadow-sm"><h2>{{ stats.total }}</h2><p class="mb-0">Total Issues</p></div></div>
+  <div class="col-md-3"><div class="card p-3 shadow-sm"><h2 class="text-danger">{{ stats.reported }}</h2><p class="mb-0">Reported</p></div></div>
+  <div class="col-md-3"><div class="card p-3 shadow-sm"><h2 class="text-warning">{{ stats.in_progress }}</h2><p class="mb-0">In Progress</p></div></div>
+  <div class="col-md-3"><div class="card p-3 shadow-sm"><h2 class="text-success">{{ stats.resolved }}</h2><p class="mb-0">Resolved</p></div></div>
+</div>
+<form method="get" class="row g-2 mb-4">
+  <div class="col-md-4">
+    <input type="text" name="q" value="{{ request.GET.q }}" class="form-control" placeholder="Search title or address...">
+  </div>
+  <div class="col-md-2">
+    <select name="category" class="form-select">
+      <option value="">All categories</option>
+      {% for value, label in categories %}
+        <option value="{{ value }}" {% if request.GET.category == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <select name="status" class="form-select">
+      <option value="">All statuses</option>
+      {% for value, label in statuses %}
+        <option value="{{ value }}" {% if request.GET.status == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <select name="severity" class="form-select">
+      <option value="">All severities</option>
+      {% for value, label in severities %}
+        <option value="{{ value }}" {% if request.GET.severity == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2 d-grid">
+    <button class="btn btn-primary">Filter</button>
+  </div>
+</form>
+<div class="hero text-center mb-5">
+  <h1 class="fw-bold">Report. Track. Improve Your City.</h1>
+  <p class="lead">Potholes, garbage, broken streetlights — report them in seconds.</p>
+  <a href="{% url 'report' %}" class="btn btn-light btn-lg mt-2">Report an Issue</a>
+</div>
+<h3 class="mb-3">Recent Issues</h3>
+<div class="row g-4">
+  {% for i in issues %}
+  <div class="col-md-4">
+    <div class="card h-100">
+      {% if i.photo %}<img src="{{ i.photo.url }}" class="card-img-top" style="height:180px;object-fit:cover;border-radius:16px 16px 0 0">{% endif %}
+      <div class="card-body">
+        <span class="badge badge-{{ i.status }} text-white">{{ i.get_status_display }}</span>
+        <h5 class="mt-2">{{ i.title }}</h5>
+        <p class="text-muted small">{{ i.category }} • {{ i.created_at|date:"M d" }}</p>
+        <p>{{ i.description|truncatewords:15 }}</p>
+      </div>
+    </div>
+  </div>
+  {% empty %}<p>No issues yet.</p>{% endfor %}
+
+
+</div>
+
+{% endblock %}
+</body>
+</html>

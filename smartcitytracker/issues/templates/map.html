@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    {% extends 'base.html' %}
+{% block content %}
+<div class="mb-2">
+  <span class="badge bg-success">Low</span>
+  <span class="badge bg-warning text-dark">Medium</span>
+  <span class="badge bg-danger">High</span>
+  <span class="badge" style="background:darkred">Critical</span>
+</div>
+<h3 class="mb-3">Issues Map</h3>
+<div id="map" style="height:500px;border-radius:16px"></div>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  var map = L.map('map').setView([20.5937, 78.9629], 5);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap'
+  }).addTo(map);
+
+  var colors = { low: "green", medium: "orange", high: "red", critical: "darkred" };
+
+  {% for issue in issues %}
+    var color = colors["{{ issue.severity }}"] || "blue";
+    L.circleMarker([{{ issue.latitude }}, {{ issue.longitude }}], {
+      radius: 9, color: color, fillColor: color, fillOpacity: 0.8
+    }).addTo(map)
+      .bindPopup("<b>{{ issue.title|escapejs }}</b><br>Severity: {{ issue.severity }}<br>Status: {{ issue.status }}");
+  {% endfor %}
+</script>
+
+{% endblock %}
+
+</body>
+</html>
